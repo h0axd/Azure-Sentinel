@@ -216,12 +216,17 @@ function ConnectAzCloud {
     Clear-AzContext -Scope Process;
     Clear-AzContext -Scope CurrentUser -Force -ErrorAction SilentlyContinue;
     
-    Add-AzEnvironment `
+    if ($CloudEnv -ne 'AzureChinaCloud' -and $CloudEnv -ne 'AzureUSGovernment') 
+    {
+        Write-Output "Attempting Adding new cloud";
+
+        Add-AzEnvironment `
         -Name $CloudEnv `
         -ActiveDirectoryEndpoint $RawCreds.activeDirectoryEndpointUrl `
         -ResourceManagerEndpoint $RawCreds.resourceManagerEndpointUrl `
         -ActiveDirectoryServiceEndpointResourceId $RawCreds.activeDirectoryServiceEndpointResourceId `
         -GraphEndpoint $RawCreds.graphEndpointUrl | out-null;
+    }
 
     $servicePrincipalKey = ConvertTo-SecureString $RawCreds.clientSecret.replace("'", "''") -AsPlainText -Force
     $psCredential = New-Object System.Management.Automation.PSCredential($RawCreds.clientId, $servicePrincipalKey)

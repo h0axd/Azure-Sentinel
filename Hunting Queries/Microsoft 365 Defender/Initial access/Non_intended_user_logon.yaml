@@ -19,7 +19,7 @@ query: |
   | summarize make_list(DeviceName);
   let relevant_users=
   IdentityInfo
-  | where MailAddress endswith "@allowed.users"
+  | where EmailAddress endswith "@allowed.users"
   | summarize make_list(AccountName);
   DeviceLogonEvents
   | where Timestamp > ago(1d)

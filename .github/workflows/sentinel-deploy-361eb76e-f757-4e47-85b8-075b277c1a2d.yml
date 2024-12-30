@@ -33,12 +33,14 @@ jobs:
       rootDirectory: '${{ github.workspace }}'
       githubAuthToken: ${{ secrets.GITHUB_TOKEN }}
       smartDeployment: 'true'
+    permissions:
+      contents: write
 
     steps:
     - name: Login to Azure (Attempt 1)
       continue-on-error: true
       id: login1
-      uses: azure/login@v1
+      uses: azure/login@v2
       if: ${{ env.cloudEnv == 'AzureCloud' }}
       with:
         creds: ${{ secrets.AZURE_SENTINEL_CREDENTIALS_361eb76ef7574e4785b8075b277c1a2d }}
@@ -51,7 +53,7 @@ jobs:
     - name: Login to Azure (Attempt 2)
       continue-on-error: true
       id: login2
-      uses: azure/login@v1
+      uses: azure/login@v2
       if: ${{ env.cloudEnv == 'AzureCloud' && steps.login1.outcome=='failure' }}
       with:
         creds: ${{ secrets.AZURE_SENTINEL_CREDENTIALS_361eb76ef7574e4785b8075b277c1a2d }}
@@ -64,7 +66,7 @@ jobs:
     - name: Login to Azure (Attempt 3)
       continue-on-error: false
       id: login3
-      uses: azure/login@v1
+      uses: azure/login@v2
       if: ${{ env.cloudEnv == 'AzureCloud' && steps.login2.outcome=='failure'  }}
       with:
         creds: ${{ secrets.AZURE_SENTINEL_CREDENTIALS_361eb76ef7574e4785b8075b277c1a2d }}
@@ -73,7 +75,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     
-    - name: Deploy Content to Azure Sentinel
+    - name: Deploy Content to Microsoft Sentinel
       uses: azure/powershell@v1
       with:
         azPSVersion: 'latest'

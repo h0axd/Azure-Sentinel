@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
+    "contentVersion": "1.1.0.0",
     "parameters": {
         "ConnectorName": {
             "defaultValue": "RecordedFuture-CustomConnector",
@@ -48,7 +48,7 @@
                             "url": "https://support.recordedfuture.com",
                             "email": "support@recordedfuture.com"
                         },
-                        "version": "1.0"
+                        "version": "1.1"
                     },
                     "host": "api.recordedfuture.com",
                     "basePath": "/gw/azure",
@@ -172,7 +172,7 @@
                                 },
                                 "summary": "IP Enrichment",
                                 "description": "IP Enrichment with Recorded Future data",
-                                "operationId": "IP_E",
+                                "operationId": "IP_Enrichment",
                                 "x-ms-visibility": "important",
                                 "parameters": [
                                     {
@@ -194,7 +194,7 @@
                                         "x-ms-visibility": "internal"
                                     },
                                     {
-                                        "name": "IntelligenceCloudTracking",
+                                        "name": "IntelligenceCloud",
                                         "in": "query",
                                         "required": false,
                                         "type": "boolean",
@@ -211,7 +211,7 @@
                                     "Threat Hunt"
                                 ],
                                 "summary": "Fetch Threat Map actors",
-                                "description": "Fetch Threat Map data for the enterprise's primary organization with filters.",
+                                "description": "Fetch Threat Map data for the enterprise's primary organization.",
                                 "operationId": "Threat_Map_Actors",
                                 "x-ms-visibility": "important",
                                 "consumes": [
@@ -222,47 +222,40 @@
                                         "name": "body",
                                         "in": "body",
                                         "required": true,
-                                        "x-ms-visibility": "important",
                                         "schema": {
                                             "type": "object",
-                                            "x-ms-visibility": "important",
                                             "properties": {
                                                 "actors": {
-                                                    "description": "List of actors",
+                                                    "description": "List of actorIds.",
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "description": "Description actor1",
-                                                        "title": "Title actor1",
-                                                        "x-ms-visibility": "important"
-                                                    }
+                                                        "description": "ActorId",
+                                                        "title": "ActorId"
+                                                    },
+                                                    "x-ms-visibility": "advance"
                                                 },
                                                 "categories": {
                                                     "description": "List of categories",
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "description": "Description category1",
-                                                        "title": "Title category1",
-                                                        "x-ms-visibility": "important"
-                                                    }
+                                                        "description": "CategoryId",
+                                                        "title": "CategoryId"
+                                                    },
+                                                    "x-ms-visibility": "internal"
                                                 },
                                                 "watchlists": {
                                                     "description": "List of watchlists",
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string",
-                                                        "description": "Description watchlist1",
-                                                        "title": "Title watchlist1",
-                                                        "x-ms-visibility": "important"
-                                                    }
+                                                        "description": "WatchlistId",
+                                                        "title": "WatchlistId"
+                                                    },
+                                                    "x-ms-visibility": "internal"
                                                 }
-                                            },
-                                            "required": [
-                                                "actors",
-                                                "categories",
-                                                "watchlists"
-                                            ]
+                                            }
                                         }
                                     }
                                 ],
@@ -274,6 +267,75 @@
                                             "properties": {
                                                 "data": {
                                                     "$ref": "#/definitions/ThreatMapActors"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "/threat/map/malware": {
+                            "post": {
+                                "tags": [
+                                    "Threat Hunt"
+                                ],
+                                "summary": "Fetch Threat Map malware",
+                                "description": "Fetch Threat Map data for the enterprise's primary organization with filters.",
+                                "operationId": "Threat_Map_Malware",
+                                "x-ms-visibility": "important",
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "parameters": [
+                                    {
+                                        "name": "body",
+                                        "in": "body",
+                                        "required": true,
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "malware": {
+                                                    "description": "List of malware Ids to include in the import.",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "description": "Malware Id",
+                                                        "title": "Malware Id"
+                                                    },
+                                                    "x-ms-visibility": "advance"
+                                                },
+                                                "categories": {
+                                                    "description": "List of categories",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "description": "CategoryId",
+                                                        "title": "CategoryId"
+                                                    },
+                                                        "x-ms-visibility": "internal"
+                                                },
+                                                "watchlists": {
+                                                    "description": "List of watchlists",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "description": "WatchlistId",
+                                                        "title": "WatchlistId"
+                                                    },
+                                                        "x-ms-visibility": "internal"
+                                                }
+                                            }
+                                        }
+                                    }
+                                ],
+                                "responses": {
+                                    "200": {
+                                        "description": "Returns Threat Map",
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/definitions/ThreatMapMalware"
                                                 }
                                             }
                                         }
@@ -397,7 +459,7 @@
                                 },
                                 "summary": "Domain Enrichment",
                                 "description": "Domain Enrichment with Recorded Future data",
-                                "operationId": "D_E",
+                                "operationId": "Domain_Enrichment",
                                 "x-ms-visibility": "important",
                                 "parameters": [
                                     {
@@ -419,7 +481,7 @@
                                         "x-ms-visibility": "internal"
                                     },
                                     {
-                                        "name": "IntelligenceCloudTracking",
+                                        "name": "IntelligenceCloud",
                                         "in": "query",
                                         "required": false,
                                         "type": "boolean",
@@ -540,7 +602,7 @@
                                 },
                                 "summary": "URL Enrichment",
                                 "description": "URL Enrichment with Recorded Future data",
-                                "operationId": "U_E",
+                                "operationId": "Url_Enrichment",
                                 "x-ms-visibility": "important",
                                 "parameters": [
                                     {
@@ -562,7 +624,7 @@
                                         "x-ms-visibility": "internal"
                                     },
                                     {
-                                        "name": "IntelligenceCloudTracking",
+                                        "name": "IntelligenceCloud",
                                         "in": "query",
                                         "required": false,
                                         "type": "boolean",
@@ -689,7 +751,7 @@
                                 },
                                 "summary": "Hash Enrichment",
                                 "description": "Hash Enrichment with Recorded Future data",
-                                "operationId": "H_E",
+                                "operationId": "Hash_Enrichment",
                                 "x-ms-visibility": "important",
                                 "parameters": [
                                     {
@@ -711,7 +773,7 @@
                                         "x-ms-visibility": "internal"
                                     },
                                     {
-                                        "name": "IntelligenceCloudTracking",
+                                        "name": "IntelligenceCloud",
                                         "in": "query",
                                         "required": false,
                                         "type": "boolean",
@@ -858,7 +920,7 @@
                                         "x-ms-visibility": "internal"
                                     },
                                     {
-                                        "name": "IntelligenceCloudTracking",
+                                        "name": "IntelligenceCloud",
                                         "in": "query",
                                         "required": false,
                                         "type": "boolean",
@@ -867,7 +929,7 @@
                                         "x-ms-summary": "See trends and track incidents over time using the Recorded Future Intelligence Cloud. This feature stores alerts generated from correlations in the Intelligence Cloud for additional intelligence to provide new analytical insights."
                                     }
                                 ],
-                                "operationId": "Vuln_E",
+                                "operationId": "Vuln_Enrichment",
                                 "x-ms-visibility": "advanced"
                             }
                         },
@@ -1109,7 +1171,7 @@
                                 },
                                 "summary": "Recorded Future RiskLists and SCF Download",
                                 "description": "Recorded Future RiskList & Security Control Feeds Download",
-                                "operationId": "R_List_D",
+                                "operationId": "Rislk_List_Download",
                                 "x-ms-visibility": "important",
                                 "parameters": [
                                     {
@@ -1475,7 +1537,7 @@
                                         }
                                     },
                                     {
-                                        "name": "IntelligenceCloudTracking",
+                                        "name": "IntelligenceCloud",
                                         "in": "query",
                                         "required": false,
                                         "type": "boolean",
@@ -1502,52 +1564,80 @@
                                             "properties": {
                                                 "actors": {
                                                     "type": "array",
+                                                    "title": "Actors",
                                                     "items": {
                                                         "type": "string",
                                                         "example": "QCwdoU"
-                                                    }
+                                                    },
+                                                    "description": "Actor IDs example: DasdD",
+                                                    "x-ms-visibility": "advance"
                                                 },
                                                 "categories": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string"
-                                                    }
+                                                    },
+                                                    "description": "Categorie IDs",
+                                                    "x-ms-visibility": "internal"
                                                 },
                                                 "watchlists": {
                                                     "type": "array",
                                                     "items": {
                                                         "type": "string"
-                                                    }
+                                                    },
+                                                    "description": "Watch List IDs",
+                                                    "x-ms-visibility": "internal"
                                                 },
                                                 "trigger_score_ip": {
+                                                    "title": "IP risk score greater than:",
                                                     "type": "integer",
-                                                    "example": 85
+                                                    "example": 65,
+                                                    "default": 65,
+                                                    "description": "Minimum Risk Score of indicators to fetch from linksentities.",
+                                                    "x-ms-visibility": "advanced"
                                                 },
                                                 "trigger_score_url": {
+                                                    "title": "Url risk score greater than:",
                                                     "type": "integer",
-                                                    "example": 85
+                                                    "example": 65,
+                                                    "default": 65,
+                                                    "description": "Minimum Risk Score of indicators to fetch from linked entities.",
+                                                    "x-ms-visibility": "advanced"
                                                 },
                                                 "trigger_score_domain": {
+                                                    "title": "Domain risk score greater than:",
                                                     "type": "integer",
-                                                    "example": 85
+                                                    "example": 65,
+                                                    "default": 65,
+                                                    "description": "Minimum Risk Score of indicators to fetch from linked entities.",
+                                                    "x-ms-visibility": "advanced"
                                                 },
                                                 "trigger_score_hash": {
+                                                    "title": "File hash risk score greater than:",
                                                     "type": "integer",
-                                                    "example": 85
+                                                    "example": 65,
+                                                    "default": 65,
+                                                    "description": "Minimum Risk Score of indicators to fetch from linked entities.",
+                                                    "x-ms-visibility": "advanced"
                                                 },
                                                 "valid_until_delta_hours": {
+                                                    "title": "Valid until delta hours:",
                                                     "type": "integer",
-                                                    "example": 1
+                                                    "example": 24,
+                                                    "default": 24,
+                                                    "description": "Valid time of indicators. This field must be less than the batch recurrence time in logic apps to avoid duplicate detections."
                                                 },
                                                 "threat_hunt_description": {
+                                                    "title": "Threat hunt description:",
                                                     "type": "string",
-                                                    "example": "Lazarus Group high risk"
+                                                    "example": "Lazarus Group high risk",
+                                                    "default": "",
+                                                    "description": "Description for indicators. If there are many imports running, use this to tell the difference between them.",
+                                                    "x-ms-visibility": "advanced"
                                                 }
-                                            },
-                                            "x-ms-visibility": "important"
+                                            }
                                         },
-                                        "required": true,
-                                        "x-ms-visibility": "important"
+                                        "required": true
                                     }
                                 ],
                                 "responses": {
@@ -1565,6 +1655,111 @@
                                 },
                                 "operationId": "STIX_Indicators",
                                 "description": "Fetch Threat Indicators for Actors in STIX format.",
+                                "x-ms-visibility": "important"
+                            }
+                        },
+                        "/threat/indicators/malware": {
+                            "post": {
+                                "tags": [
+                                    "Threat Hunt",
+                                    "STIX"
+                                ],
+                                "summary": "Fetch Threat Indicators for Malware in STIX format.",
+                                "parameters": [
+                                    {
+                                        "name": "body",
+                                        "in": "body",
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "malware": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "LnK3Q6"
+                                                    },
+                                                    "description": "Malware IDs example DasdD",
+                                                    "x-ms-visibility": "advance"
+                                                },
+                                                "categories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": "Categorie IDs",
+                                                    "x-ms-visibility": "internal"
+                                                },
+                                                "watchlists": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": "Watch List IDs",
+                                                    "x-ms-visibility": "internal"
+                                                },
+                                                "trigger_score_ip": {
+                                                    "title": "IP risk score greater than:",
+                                                    "type": "integer",
+                                                    "default": 65,
+                                                    "example": 65,
+                                                    "x-ms-visibility": "advanced"
+                                                },
+                                                "trigger_score_url": {
+                                                    "title": "Url risk score greater than:",
+                                                    "type": "integer",
+                                                    "default": 65,
+                                                    "example": 65,
+                                                    "x-ms-visibility": "advanced"
+                                                },
+                                                "trigger_score_domain": {
+                                                    "title": "Domain risk score greater than:",
+                                                    "type": "integer",
+                                                    "default": 65,
+                                                    "example": 65,
+                                                    "x-ms-visibility": "advanced"
+                                                },
+                                                "trigger_score_hash": {
+                                                    "title": "File hash risk score greater than:",
+                                                    "type": "integer",
+                                                    "default": 65,
+                                                    "example": 65,
+                                                    "x-ms-visibility": "advanced"
+                                                },
+                                                "valid_until_delta_hours": {
+                                                    "title": "Valid until delta hours:",
+                                                    "type": "integer",
+                                                    "description": "Valid time of indicators. This field must be less than the batch recurrence time in logic apps to avoid duplicate detections.",
+                                                    "default": 24,
+                                                    "example": 24
+                                                },
+                                                "threat_hunt_description": {
+                                                    "default": "",
+                                                    "type": "string",
+                                                    "example": "Cobalt Strike Beacon high risk",
+                                                    "description": "Description for indicators. If there are many imports running, use this to tell the difference between them.",
+                                                    "x-ms-visibility": "advanced"
+
+                                                }
+                                            }
+                                        },
+                                        "required": true
+                                    }
+                                ],
+                                "responses": {
+                                    "200": {
+                                        "description": "List of Threat Indicator in STIX format.",
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/definitions/ThreatHuntMalware"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "operationId": "STIX_MalwareIndicators",
+                                "description": "Fetch Threat Indicators for Malware in STIX format.",
                                 "x-ms-visibility": "important"
                             }
                         }
@@ -1913,6 +2108,214 @@
                                                 "url": {
                                                     "type": "string",
                                                     "example": "https://app.recordedfuture.com/live/sc/entity/QCwdoU"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "confidence",
+                                    "description",
+                                    "id",
+                                    "indicator_types",
+                                    "labels",
+                                    "name",
+                                    "pattern",
+                                    "pattern_type",
+                                    "spec_version",
+                                    "type",
+                                    "created",
+                                    "modified",
+                                    "valid_from",
+                                    "valid_until",
+                                    "external_references"
+                                ]
+                            }
+                        },
+                        "ThreatMapMalware": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "threat_map": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "alias": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "categories": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "intent": {
+                                                        "type": "integer",
+                                                        "format": "int32"
+                                                    },
+                                                    "opportunity": {
+                                                        "type": "integer",
+                                                        "format": "int32"
+                                                    },
+                                                    "log_entries": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "watchlist": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "entity": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "string"
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "severity": {
+                                                                    "type": "integer",
+                                                                    "format": "int32"
+                                                                },
+                                                                "axis": {
+                                                                    "type": "string"
+                                                                },
+                                                                "date": {
+                                                                    "type": "string",
+                                                                    "format": "date-time"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "date": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "ThreatHuntMalware": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "confidence": {
+                                        "type": "integer",
+                                        "example": 89
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Recorded Future - Threat Hunt - Threat Malware - DOMAIN - Cobalt Strike Beacon Malware (LnK3Q6) - [Cobalt Strike Beacon high risk]"
+                                    },
+                                    "id": {
+                                        "type": "string",
+                                        "example": "indicator--321991ed-aca0-4e25-85a0-c1615c75074f"
+                                    },
+                                    "indicator_types": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "malicious-activity"
+                                        }
+                                    },
+                                    "labels": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "{ \"RecordedFuturePortalLink\": \"https://app.recordedfuture.com/live/sc/entity/LnK3Q6\"}"
+                                        }
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "masterunis.net"
+                                    },
+                                    "pattern": {
+                                        "type": "string",
+                                        "example": "[[domain-name:value = 'masterunis.net']"
+                                    },
+                                    "pattern_type": {
+                                        "type": "string",
+                                        "example": "stix"
+                                    },
+                                    "spec_version": {
+                                        "type": "string",
+                                        "example": "2.1"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "indicator"
+                                    },
+                                    "created": {
+                                        "type": "string",
+                                        "example": "2023-09-20T13:39:35.993568+00:00"
+                                    },
+                                    "modified": {
+                                        "type": "string",
+                                        "example": "2023-09-20T13:39:35.993568+00:00"
+                                    },
+                                    "valid_from": {
+                                        "type": "string",
+                                        "example": "2023-09-20T13:39:35.993568+00:00"
+                                    },
+                                    "valid_until": {
+                                        "type": "string",
+                                        "example": "2023-09-20T14:39:35.993568+00:00"
+                                    },
+                                    "external_references": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "source_name": {
+                                                    "type": "string",
+                                                    "example": "Recorded Future"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Recorded Future Entity card for Malware: Cobalt Strike Beacon (LnK3Q6)"
+                                                },
+                                                "external_id": {
+                                                    "type": "string",
+                                                    "example": "LnK3Q6"
+                                                },
+                                                "url": {
+                                                    "type": "string",
+                                                    "example": "https://app.recordedfuture.com/live/sc/entity/LnK3Q6"
                                                 }
                                             }
                                         }

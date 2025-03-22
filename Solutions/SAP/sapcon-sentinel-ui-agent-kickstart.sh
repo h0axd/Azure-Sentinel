@@ -271,7 +271,7 @@ elif [ "$os" == '"sles"' ]; then
 		if which az >/dev/null 2>&1; then
 			#AZ is installed, check if it is out-of date version with compatibility issues
 			azver=$(az version | jq '."azure-cli"')
-			if verlte "2.33.1" "$azver"; then
+			if verlte "$azver" "2.33.1"; then
 				log "Installed version $azver is out of date, removing older version"
 				sudo zypper rm -y --clean-deps azure-cli >/dev/null
 				log "Installing Azure CLI"
@@ -315,6 +315,14 @@ fi
 log "Creating group 'docker' and adding current user to 'docker' group"
 sudo usermod -aG docker "$USER"
 
+validateKeyVault() {
+	az keyvault secret list --id "https://$kv.vault.azure.net/" >/dev/null 2>&1
+	if [ ! $? -eq 0 ]; then
+		log "Cannot connect to Key Vault $kv. Agent identity must have 'Key Vault Secrets User' role or list, get secret permissions on the Key Vault."
+		exit 1
+	fi
+}
+
 if [ "$MODE" == "kvmi" ]; then
 	log "Validating Azure managed identity"
 	az login --identity --allow-no-subscriptions >/dev/null 2>&1
@@ -324,6 +332,7 @@ if [ "$MODE" == "kvmi" ]; then
 		log 'For more information check - https://docs.microsoft.com/cli/azure/install-azure-cli'
 		exit 1
 	fi
+	validateKeyVault
 elif [ "$MODE" == "kvsi" ]; then
 	log "Validating service principal identity"
 	az login --service-principal -u "$APPID" -p "$APPSECRET" --tenant "$TENANT" --allow-no-subscriptions >/dev/null 2>&1
@@ -331,11 +340,32 @@ elif [ "$MODE" == "kvsi" ]; then
 		log "Logon with $APPID failed, please check application ID, secret and tenant ID. Ensure the application has been added as an enterprise application"
 		exit 1
 	fi
-	az keyvault secret list --id "https://$kv.vault.azure.net/" >/dev/null 2>&1
-	if [ ! $? -eq 0 ]; then
-		log "Cannot connect to keyvault $kv. Make sure application $APPID has been granted privileges to the keyvault"
-		exit 1
+	validateKeyVault
+fi
+
+# If $HTTPPROXY is set, configure the Docker Daemon to explicitly use it;
+# otherwise, Docker commands (e.g., 'docker pull') will ignore any proxy settings defined at the OS level.
+if [ -n "$HTTPPROXY" ]; then
+	# https://docs.docker.com/engine/daemon/proxy/#systemd-unit-file
+	if ! sudo mkdir -p /etc/systemd/system/docker.service.d; then
+			log "Error: Failed to create directory /etc/systemd/system/docker.service.d"
+			exit 1
 	fi
+
+	if ! sudo tee /etc/systemd/system/docker.service.d/http-proxy.conf > /dev/null <<EOF
+[Service]
+Environment="HTTP_PROXY=${HTTPPROXY}"
+Environment="HTTPS_PROXY=${HTTPPROXY}"
+Environment="NO_PROXY=localhost,127.0.0.1"
+EOF
+	then
+			log "Error: Failed to write /etc/systemd/system/docker.service.d/http-proxy.conf"
+			exit 1
+	fi
+
+	log "Proxy $HTTPPROXY successfully configured, restarting Docker Daemon..."
+	sudo systemctl daemon-reload
+	sudo systemctl restart docker
 fi
 
 log 'Deploying Microsoft Sentinel SAP data connector.'
@@ -413,7 +443,7 @@ if [ -n "$NETWORKSTRING" ]; then
 fi
 
 if [ -n "$HTTPPROXY" ]; then
-	cmdparams+=" -e HTTP_PROXY=$HTTPPROXY -e HTTPS_PROXY=$HTTPPROXY"
+	cmdparams+=" -e HTTP_PROXY=$HTTPPROXY -e HTTPS_PROXY=$HTTPPROXY -e NO_PROXY=169.254.169.254"
 fi
 
 cmdparams+=" -e AZURE_KEY_VAULT_NAME=$kv"

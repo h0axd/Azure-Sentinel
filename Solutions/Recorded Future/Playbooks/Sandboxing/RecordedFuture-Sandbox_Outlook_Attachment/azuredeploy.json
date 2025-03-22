@@ -9,7 +9,7 @@
             "After deployment you have to open the playbook and configure and authorize all connections and press save."
         ],
         "prerequisitesDeployTemplateFile": "",
-        "lastUpdateTime": "2023-04-28T00:00:00.000Z",
+        "lastUpdateTime": "2024-01-12T00:00:00.000Z",
         "entities": [],
         "tags": [ "Enrichment" ],
         "support": {
@@ -24,6 +24,11 @@
                 "version": "1.0",
                 "title": "RecordedFuture-Sandbox_Outlook_Attachment",
                 "notes": [ "Initial version" ]
+            },
+            {
+                "version": "1.1",
+                "title": "API Connectors",
+                "notes": [ "API connection rename." ]
             }
         ]
     },
@@ -46,9 +51,9 @@
         }
     },
     "variables": {
-        "MicrosoftSentinelConnectionName": "[concat('MicrosoftSentinel-', parameters('PlaybookName'))]",
+        "MicrosoftSentinelConnectionName": "RecordedFuture-MicrosoftSentinelConnection",
         "OutlookConnectionName": "[concat('Outlook-', parameters('PlaybookName'))]",
-        "RecordedfuturesandboConnectionName": "[concat('Recordedfuturesandbo-', parameters('PlaybookName'))]"
+        "RecordedfuturesandboConnectionName": "Recordedfuture-SandboConnection"
     },
     "resources": [
         {
@@ -91,7 +96,7 @@
                                 },
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['outlook_1']['connectionId']"
+                                        "name": "@parameters('$connections')['outlook']['connectionId']"
                                     }
                                 },
                                 "subscribe": {
@@ -128,7 +133,7 @@
                                         },
                                         "host": {
                                             "connection": {
-                                                "name": "@parameters('$connections')['recordedfuturesandbo_1']['connectionId']"
+                                                "name": "@parameters('$connections')['recordedfuturesandbo']['connectionId']"
                                             }
                                         },
                                         "method": "get",
@@ -151,7 +156,7 @@
                                                 },
                                                 "host": {
                                                     "connection": {
-                                                        "name": "@parameters('$connections')['azuresentinel_1']['connectionId']"
+                                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                                     }
                                                 },
                                                 "method": "post",
@@ -170,7 +175,7 @@
                                                 },
                                                 "host": {
                                                     "connection": {
-                                                        "name": "@parameters('$connections')['azuresentinel_1']['connectionId']"
+                                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                                     }
                                                 },
                                                 "method": "put",
@@ -193,7 +198,7 @@
                                                 },
                                                 "host": {
                                                     "connection": {
-                                                        "name": "@parameters('$connections')['outlook_1']['connectionId']"
+                                                        "name": "@parameters('$connections')['outlook']['connectionId']"
                                                     }
                                                 },
                                                 "method": "post",
@@ -244,7 +249,7 @@
                                         },
                                         "host": {
                                             "connection": {
-                                                "name": "@parameters('$connections')['recordedfuturesandbo_1']['connectionId']"
+                                                "name": "@parameters('$connections')['recordedfuturesandbo']['connectionId']"
                                             }
                                         },
                                         "method": "post",
@@ -276,7 +281,7 @@
                                                 },
                                                 "host": {
                                                     "connection": {
-                                                        "name": "@parameters('$connections')['recordedfuturesandbo_1']['connectionId']"
+                                                        "name": "@parameters('$connections')['recordedfuturesandbo']['connectionId']"
                                                     }
                                                 },
                                                 "method": "get",
@@ -339,7 +344,7 @@
                 "parameters": {
                     "$connections": {
                         "value": {
-                            "azuresentinel_1": {
+                            "azuresentinel": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('MicrosoftSentinelConnectionName'))]",
                                 "connectionName": "[variables('MicrosoftSentinelConnectionName')]",
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Azuresentinel')]",
@@ -349,12 +354,12 @@
                                     }
                                 }
                             },
-                            "outlook_1": {
+                            "outlook": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('OutlookConnectionName'))]",
                                 "connectionName": "[variables('OutlookConnectionName')]",
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Outlook')]"
                             },
-                            "recordedfuturesandbo_1": {
+                            "recordedfuturesandbo": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('RecordedfuturesandboConnectionName'))]",
                                 "connectionName": "[variables('RecordedfuturesandboConnectionName')]",
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/Recordedfuturesandbo')]"

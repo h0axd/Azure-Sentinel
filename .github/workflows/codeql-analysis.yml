@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ master ]
   schedule:
-    - cron: '30 5 * * 6'
+    - cron: '0 0 * * *'  # Run daily at midnight UTC
 
 jobs:
   analyze:
@@ -21,18 +21,18 @@ jobs:
       fail-fast: false
       matrix:
         language: [ 'javascript', 'python' ]
-        # Removed 'ruby' as it's not commonly used in Azure Sentinel
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
-        queries: security-extended,security-and-quality
-        # Added specific paths to analyze
+        queries: security-and-quality
         paths: |
           Playbooks/
           Detections/
@@ -48,12 +48,12 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
-        # Added severity levels to focus on
-        category: /language:${{ matrix.language }}
+        category: "/language:${{ matrix.language }}"
 
-    # Added step to upload results
-    - name: Upload CodeQL Results
-      uses: actions/upload-artifact@v3
+    - name: Upload SARIF file
+      uses: actions/upload-artifact@v2
       with:
         name: codeql-results
-        path: ./.codeql/results
+        path: |
+          ./.codeql/results/
+          ./.codeql/databases/ 
